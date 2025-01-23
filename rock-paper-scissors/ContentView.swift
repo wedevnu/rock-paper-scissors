@@ -24,9 +24,17 @@ struct ContentView: View {
             .font(.headline)
             .padding(.top, 20)
 
-        Spacer() // Ensure the text stays at the top
+//        Spacer() // Ensure the text stays at the top
         
         VStack {
+            if userChoice != .placeholder {
+                VStack {
+                    Text("Your Choice")
+                        .font(.headline)
+                        .padding(.bottom, 5)
+                }
+                .padding()
+            }
             Text(userChoice.rawValue)
                 .font(.system(size:80))
                 .padding()
