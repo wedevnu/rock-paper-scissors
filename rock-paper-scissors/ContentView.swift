@@ -3,61 +3,34 @@
 //  rock-paper-scissors
 //
 //  Created by Alan Zhang on 1/22/25.
+//  Contributor: Nicole Contreras
 //
 
 import SwiftUI
 
-enum Emoji: String, CaseIterable {
+enum Move: String, CaseIterable {
     case rock = "🪨"
     case paper = "📜"
     case scissors = "✂️"
-    case placeholder = ""
 }
 
 struct ContentView: View {
-    @State private var userChoice: Emoji = .placeholder
-    @State private var computerChoice: Emoji = .placeholder
+    // State variables for user choice, computer choice, and result message
+    @State private var userChoice: Move = .rock
+    @State private var computerChoice: Move = .rock
     @State private var result: String = ""
-    
-    var body: some View {
-        Text("Rock, Paper, Scissors!")
-            .font(.headline)
-            .padding(.top, 20)
 
-//        Spacer() // Ensure the text stays at the top
-        
+    var body: some View {
         VStack {
-            if userChoice != .placeholder {
-                VStack {
-                    Text("Your Choice")
-                        .font(.headline)
-                        .padding(.bottom, 5)
-                }
-                .padding()
-            }
-            Text(userChoice.rawValue)
-                .font(.system(size:80))
-                .padding()
-            
-            Picker("Select Emoji", selection: $userChoice) {
-                ForEach(Emoji.allCases.filter { $0 != .placeholder }, id: \.self) { emoji in
-                    Text(emoji.rawValue)
-                        .font(.system(size: 40)) // Adjust size as needed
-                }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
-            
-            Button("Submit") {
-                if userChoice != .placeholder {
-                    computerChoice = Emoji.allCases.filter { $0 != .placeholder }.randomElement() ?? .placeholder
-                    determineResult()
-                }
-            }
-            .padding()
-            .disabled(userChoice == .placeholder)
-            
-            if computerChoice != .placeholder {
+            // Title
+            Text("Rock, Paper, Scissors!")
+                .font(.largeTitle)
+                .padding(.top, 20)
+
+            Spacer() // Pushes everything upward
+
+            // Computer's Choice Section
+            if result != "" {
                 VStack {
                     Text("CPU Choice")
                         .font(.headline)
@@ -65,31 +38,53 @@ struct ContentView: View {
                     Text(computerChoice.rawValue)
                         .font(.system(size: 80))
                 }
-                .padding()
+                    .padding()
+
             }
-            
+        
+            // Game Result Section
             if !result.isEmpty {
                 Text(result)
                     .font(.title)
                     .foregroundColor(.blue)
                     .padding()
             }
+
+            Spacer()
         }
-    }
-    
-    private func determineResult() {
-        if userChoice == computerChoice {
-            result = "It's a tie!"
-        } else if (userChoice == .rock && computerChoice == .scissors) ||
-                    (userChoice == .paper && computerChoice == .rock) ||
-                    (userChoice == .scissors && computerChoice == .paper) {
-            result = "You win!"
-        } else {
-            result = "CPU wins!"
-        }
+        .padding()
+        
+            // User Choice Section
+            VStack {
+                Text("Your Choice")
+                    .font(.headline)
+                    .padding(.bottom, 5)
+                Text(userChoice.rawValue)
+                    .font(.system(size: 80))
+                    .padding()
+            }
+            
+
+            // Picker for selecting the user's move
+            Picker("Select Emoji", selection: $userChoice) {
+                ForEach(Move.allCases, id: \.self) { move in
+                    Text(move.rawValue)
+                        .font(.system(size: 40)) // Display the emoji in picker
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding()
+
+            // Submit Button
+            Button("Submit") {
+                computerChoice = GameLogic.randomMove()
+                result = GameLogic.determineWinner(player: userChoice, computer: computerChoice)
+            }
+            .padding()
     }
 }
 
 #Preview {
     ContentView()
 }
+
